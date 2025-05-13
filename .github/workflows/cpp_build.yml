@@ -36,7 +36,6 @@ jobs:
           export OUTPUT_DIR=${{ vars.OUTPUT_DIR }}/${{ steps.get_repo.outputs.repo_name }}/${{ github.ref_name }}
           mkdir -p ${OUTPUT_DIR}/csv
           export LIB_DIR=${{ vars.OUTPUT_DIR }}
-          mkdir -p "${OUTPUT_DIR}"        
           mkdir -p "${SRC_DIR}/build"        
           docker run --rm \
             -v "${SRC_DIR}:/workspace" \
