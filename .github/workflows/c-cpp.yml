@@ -2,9 +2,9 @@ name: Build C++ Project in Docker
 
 on:
   push:
-    branches: [ main ]
+    branches: [ master ]
   pull_request:
-    branches: [ main ]
+    branches: [ master ]
 
   # 添加 repository_dispatch 事件作为触发器
   repository_dispatch:
