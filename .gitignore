@@ -158,3 +158,4 @@ MODULE.bazel.lock
 # Ignore the generated docs
 docs/sitetest_code
 test_code
+test_code
