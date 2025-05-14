@@ -34,9 +34,9 @@ jobs:
         run: |
           REPO_NAME=$(basename "${{ github.repository }}")
           echo "repo_name=$REPO_NAME" >> "$GITHUB_OUTPUT"
-          echo "hash=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
-          echo "message=$(git log -1 --pretty=%B)" >> $GITHUB_OUTPUT
-          echo "tag=$(git describe --tags --abbrev=0 --exact-match 2>/dev/null || echo 'no-tag')" >> $GITHUB_OUTPUT
+          echo "hash=$(git -C my-code-${{ steps.gen_time.outputs.ts }} rev-parse HEAD)" >> $GITHUB_OUTPUT
+          echo "message=$(git -C my-code-${{ steps.gen_time.outputs.ts }} log -1 --pretty=%B)" >> $GITHUB_OUTPUT
+          echo "tag=$(git -C my-code-${{ steps.gen_time.outputs.ts }} describe --tags --abbrev=0 --exact-match 2>/dev/null || echo 'no-tag')" >> $GITHUB_OUTPUT
       - name: Build inside Docker and output artifact
         run: |
           export SRC_DIR="${GITHUB_WORKSPACE}/my-code-${{ steps.gen_time.outputs.ts }}"
