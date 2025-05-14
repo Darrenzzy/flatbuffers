@@ -37,6 +37,7 @@ jobs:
           echo "hash=$(git -C my-code-${{ steps.gen_time.outputs.ts }} rev-parse HEAD)" >> $GITHUB_OUTPUT
           echo "message=$(git -C my-code-${{ steps.gen_time.outputs.ts }} log -1 --pretty=%B)" >> $GITHUB_OUTPUT
           echo "tag=$(git -C my-code-${{ steps.gen_time.outputs.ts }} describe --tags --abbrev=0 --exact-match 2>/dev/null || echo 'no-tag')" >> $GITHUB_OUTPUT
+          echo "time=$(git -C my-code-${{ steps.gen_time.outputs.ts }} log -1 --pretty=format:'%cI')" >> $GITHUB_OUTPUT
       - name: Build inside Docker and output artifact
         run: |
           export SRC_DIR="${GITHUB_WORKSPACE}/my-code-${{ steps.gen_time.outputs.ts }}"
@@ -73,6 +74,7 @@ jobs:
             echo "commit_tag,${{ steps.get_commit_info.outputs.tag }}"
             echo "branch,${{ steps.set_branch.outputs.branch_name }}"
             echo "commit_hash,${{ steps.get_commit_info.outputs.hash }}"      
+            echo "commit_time,${{ steps.get_commit_info.outputs.time }}"
             echo "actor,${{ github.actor }}"
             echo "event_name,${{ github.event_name }}" 
             echo "image_name,davidwu-base-gcc" 
