@@ -29,15 +29,18 @@ jobs:
         with:
           ref:  ${{ steps.set_branch.outputs.branch_name }}
           path: my-code-${{ steps.gen_time.outputs.ts }}      
-      - name: Get repo name only
-        id: get_repo
+      - name: Get commit info from checked out branch
+        id: get_commit_info
         run: |
           REPO_NAME=$(basename "${{ github.repository }}")
           echo "repo_name=$REPO_NAME" >> "$GITHUB_OUTPUT"
+          echo "hash=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
+          echo "message=$(git log -1 --pretty=%B)" >> $GITHUB_OUTPUT
+          echo "tag=$(git describe --tags --abbrev=0 --exact-match 2>/dev/null || echo 'no-tag')" >> $GITHUB_OUTPUT
       - name: Build inside Docker and output artifact
         run: |
           export SRC_DIR="${GITHUB_WORKSPACE}/my-code-${{ steps.gen_time.outputs.ts }}"
-          export OUTPUT_DIR=${{ vars.OUTPUT_DIR }}/${{ steps.get_repo.outputs.repo_name }}/${{ steps.set_branch.outputs.branch_name }}
+          export OUTPUT_DIR=${{ vars.OUTPUT_DIR }}/${{ steps.get_commit_info.outputs.repo_name }}/${{ steps.set_branch.outputs.branch_name }}
           mkdir -p ${OUTPUT_DIR}/csv
           export LIB_DIR=${{ vars.OUTPUT_DIR }}
           mkdir -p "${SRC_DIR}/build"        
@@ -57,29 +60,25 @@ jobs:
               echo "cmake_version,$(cmake --version | head -n1 | awk '{print $3}')" >> /output/csv/system.csv &&
               echo "gcc_version,$(g++ -dumpfullversion)" >> /output/csv/system.csv &&
               echo done"
-      - name: Get latest commit message
-        id: get_commit_msg
-        run: |
-          msg=$(git -C my-code-${{ steps.gen_time.outputs.ts }} log -1 --pretty=%B)
-          echo "message=$msg" >> "$GITHUB_OUTPUT" 
       - name: Generate hash and build info CSV
         run: |
-          export OUTPUT_DIR=${{ vars.OUTPUT_DIR }}/${{ steps.get_repo.outputs.repo_name }}/${{ steps.set_branch.outputs.branch_name }}
+          export OUTPUT_DIR=${{ vars.OUTPUT_DIR }}/${{ steps.get_commit_info.outputs.repo_name }}/${{ steps.set_branch.outputs.branch_name }}
           HASH_FILE="${OUTPUT_DIR}/csv/hashes.csv"          
           BUILD_INFO_FILE="${OUTPUT_DIR}/csv/build_info.csv"
           {
             echo "key,value"
-            echo "repo_name,${{ steps.get_repo.outputs.repo_name }}"
+            echo "repo_name,${{ steps.get_commit_info.outputs.repo_name }}"
             echo "repo,${{ github.repository }}"
-            echo "commit_msg,${{ steps.get_commit_msg.outputs.message }}"
-            echo "commit_tag,${{ github.ref }}"
-            echo "branch,${{ github.ref_name }}"
-            echo "commit_hash,${{ github.sha }}"
+            echo "commit_msg,${{ steps.get_commit_info.outputs.message }}"
+            echo "commit_tag,${{ steps.get_commit_info.outputs.tag }}"
+            echo "branch,${{ steps.set_branch.outputs.branch_name }}"
+            echo "commit_hash,${{ steps.get_commit_info.outputs.hash }}"      
             echo "actor,${{ github.actor }}"
             echo "event_name,${{ github.event_name }}" 
             echo "image_name,davidwu-base-gcc" 
             echo "image_hash,a2e1c068baa8" 
             echo "mount_path,${OUTPUT_DIR}"
+            echo "output_path,${OUTPUT_DIR}"
           } > "$BUILD_INFO_FILE"
           echo "filename,sha256" > "$HASH_FILE"
           find "${OUTPUT_DIR}" -type f -executable | while read file; do
@@ -108,9 +107,10 @@ jobs:
           # 例如，可以发送仓库 A 的 commit SHA 或分支信息
           client-payload: |
             {
-              "ref": "${{ github.ref }}",
+              "ref": "${{ steps.set_branch.outputs.branch_name }}",
+              "full_ref": "${{ github.ref }}",
               "sha": "${{ github.sha }}",
-              "repo_name": "${{ steps.get_repo.outputs.repo_name }}",
+              "repo_name": "${{ steps.get_commit_info.outputs.repo_name }}",
               "triggered_by_repo": "${{ github.repository }}"
             }
       - name: Clean up work directory
