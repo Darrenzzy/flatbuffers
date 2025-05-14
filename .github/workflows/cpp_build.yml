@@ -21,9 +21,13 @@ jobs:
       - name: Generate timestamp
         id: gen_time
         run: echo "ts=$(date +'%Y%m%d_%H%M%S')" >> "$GITHUB_OUTPUT"
+      - name: Set checkout branch
+        id: set_branch
+        run: echo "branch_name=master" >> "$GITHUB_OUTPUT"
       - name: Checkout repository to dynamic path
         uses: actions/checkout@v4
         with:
+          ref:  ${{ steps.set_branch.outputs.branch_name }}
           path: my-code-${{ steps.gen_time.outputs.ts }}      
       - name: Get repo name only
         id: get_repo
@@ -33,7 +37,7 @@ jobs:
       - name: Build inside Docker and output artifact
         run: |
           export SRC_DIR="${GITHUB_WORKSPACE}/my-code-${{ steps.gen_time.outputs.ts }}"
-          export OUTPUT_DIR=${{ vars.OUTPUT_DIR }}/${{ steps.get_repo.outputs.repo_name }}/${{ github.ref_name }}
+          export OUTPUT_DIR=${{ vars.OUTPUT_DIR }}/${{ steps.get_repo.outputs.repo_name }}/${{ steps.set_branch.outputs.branch_name }}
           mkdir -p ${OUTPUT_DIR}/csv
           export LIB_DIR=${{ vars.OUTPUT_DIR }}
           mkdir -p "${SRC_DIR}/build"        
@@ -60,12 +64,13 @@ jobs:
           echo "message=$msg" >> "$GITHUB_OUTPUT" 
       - name: Generate hash and build info CSV
         run: |
-          export OUTPUT_DIR=${{ vars.OUTPUT_DIR }}/${{ steps.get_repo.outputs.repo_name }}/${{ github.ref_name }}
+          export OUTPUT_DIR=${{ vars.OUTPUT_DIR }}/${{ steps.get_repo.outputs.repo_name }}/${{ steps.set_branch.outputs.branch_name }}
           HASH_FILE="${OUTPUT_DIR}/csv/hashes.csv"          
           BUILD_INFO_FILE="${OUTPUT_DIR}/csv/build_info.csv"
           {
             echo "key,value"
-            echo "repo_name,${{ github.repository }}"
+            echo "repo_name,${{ steps.get_repo.outputs.repo_name }}"
+            echo "repo,${{ github.repository }}"
             echo "commit_msg,${{ steps.get_commit_msg.outputs.message }}"
             echo "commit_tag,${{ github.ref }}"
             echo "branch,${{ github.ref_name }}"
@@ -82,6 +87,10 @@ jobs:
             rel_path="${file#${OUTPUT_DIR}/}"
             echo "${rel_path},${hash}" >> "$HASH_FILE"
           done
+          DEPEND_REPO_FILE="${OUTPUT_DIR}/csv/depen_repo.csv"
+          {
+            echo "key,value"
+          } > "$DEPEND_REPO_FILE"
           echo "✅ Hash CSV generated at: ${HASH_FILE}"
           cat "$HASH_FILE"
           echo "✅ build info CSV generated at: ${BUILD_INFO_FILE}"
