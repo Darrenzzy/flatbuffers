@@ -156,4 +156,4 @@ kotlin/**/generated
 MODULE.bazel.lock
 
 # Ignore the generated docs
-docs/site
+docs/sitetest_code
