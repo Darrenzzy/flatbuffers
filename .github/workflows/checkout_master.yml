@@ -3,6 +3,10 @@
 name: Dispatch Master CI
 
 on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
   repository_dispatch:
     types: [ triggered-by-repo-a-update ]
 

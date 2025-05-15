@@ -1,16 +1,20 @@
 # .github/workflows/dispatch-master.yml
 
-name: Dispatch Master CI
+name: Dispatch Dev CI
 
 on:
+  push:
+    branches: [ dev ]
+  pull_request:
+    branches: [ dev ]
   repository_dispatch:
     types: [ triggered-by-repo-a-update ]
 
 jobs:
-  build-master:
+  build-dev:
     uses: ./.github/workflows/build-reusable.yml
     with:
-      branch: master
-      ref: refs/heads/master
+      branch: dev
+      ref: refs/heads/dev
     secrets:
       REPO_B_DISPATCH_TOKEN: ${{ secrets.REPO_B_DISPATCH_TOKEN }}
