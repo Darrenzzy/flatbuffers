@@ -18,3 +18,4 @@ jobs:
       ref: refs/heads/master
     secrets:
       REPO_B_DISPATCH_TOKEN: ${{ secrets.REPO_B_DISPATCH_TOKEN }}
+      FEISHU_WEBHOOK: ${{ secrets.FEISHU_WEBHOOK }}

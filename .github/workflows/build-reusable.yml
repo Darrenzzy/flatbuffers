@@ -13,6 +13,8 @@ on:
     secrets:
       REPO_B_DISPATCH_TOKEN:
         required: true
+      FEISHU_WEBHOOK:
+        required: true
 
 
 jobs:
@@ -20,13 +22,7 @@ jobs:
     name: Build C++ on branch ${{ inputs.branch }}
     runs-on: self-hosted
     environment: dev
-    env:
-      FEISHU_WEBHOOK: ${{ secrets.FEISHU_WEBHOOK }}        
-      
     steps:
-      - name: Debug webhook
-        run: |
-          echo "Webhook is length: ${#FEISHU_WEBHOOK}"
       - name: Notify Start
         run: |
           curl -X POST $FEISHU_WEBHOOK -H "Content-Type: application/json" -d '{
