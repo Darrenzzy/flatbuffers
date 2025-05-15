@@ -13,8 +13,6 @@ on:
     secrets:
       REPO_B_DISPATCH_TOKEN:
         required: true
-      FEISHU_WEBHOOK:
-        required: true
 
 
 jobs:
