@@ -151,7 +151,7 @@ jobs:
         run: |
           curl -X POST ${{ secrets.FEISHU_WEBHOOK }} -H "Content-Type: application/json" -d '{
             "msg_type": "text",
-            "content": { "text": "📦 所有步骤完成，构建产物已上传。" }
+            "content": { "text": "📦 所有步骤完成，构建产物已生成。" }
           }'
 
       # ❌ 如果失败则发送飞书通知
