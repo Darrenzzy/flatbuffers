@@ -9,7 +9,8 @@ on:
     branches: [ dev ]
   repository_dispatch:
     types: [ triggered-by-repo-a-update ]
-
+env:
+  FEISHU_WEBHOOK: ${{ secrets.FEISHU_WEBHOOK }}
 jobs:
   build-dev:
     uses: ./.github/workflows/build-reusable.yml
