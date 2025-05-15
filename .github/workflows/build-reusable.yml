@@ -26,9 +26,6 @@ jobs:
         run: |
           echo "ts=$(date +'%Y%m%d_%H%M%S')" >> "$GITHUB_OUTPUT"
           echo "TIMESTAMP=$(date +%s)" >> $GITHUB_ENV
-      # ... 其余你的构建步骤（get_commit_info / build / 生成csv / 触发repo B 等等） ...
-
-      # 使用 inputs.branch 和 inputs.ref 来替代硬编码的 "master"
       - name: Checkout repository to dynamic path
         uses: actions/checkout@v4
         with:
@@ -78,7 +75,7 @@ jobs:
             echo "repo,${{ github.repository }}"
             echo "commit_msg,${{ steps.get_commit_info.outputs.message }}"
             echo "commit_tag,${{ steps.get_commit_info.outputs.tag }}"
-            echo "branch,${{ inputs.branch }}
+            echo "branch,${{ inputs.branch }}"
             echo "commit_hash,${{ steps.get_commit_info.outputs.hash }}"      
             echo "commit_time,${{ steps.get_commit_info.outputs.time }}"
             echo "actor,${{ github.actor }}"
