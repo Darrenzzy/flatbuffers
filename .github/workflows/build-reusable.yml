@@ -68,6 +68,8 @@ jobs:
           export OUTPUT_DIR=${{ vars.OUTPUT_DIR }}/${{ steps.get_commit_info.outputs.repo_name }}/${{ inputs.branch }}
           HASH_FILE="${OUTPUT_DIR}/csv/hashes.csv"          
           BUILD_INFO_FILE="${OUTPUT_DIR}/csv/build_info.csv"
+          touch $HASH_FILE
+          touch $BUILD_INFO_FILE
           {
             echo "key,value"
             echo "build_id,${{ steps.get_commit_info.outputs.repo_name }}_${{ inputs.branch }}_${{ env.TIMESTAMP }}"
