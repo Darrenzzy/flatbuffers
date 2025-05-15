@@ -43,7 +43,7 @@ jobs:
       - name: Build inside Docker and output artifact
         run: |
           export SRC_DIR="${GITHUB_WORKSPACE}/build-${{ steps.gen_time.outputs.ts }}"
-          export OUTPUT_DIR=${{ vars.OUTPUT_DIR }}/${{ steps.get_commit_info.outputs.repo_name }}/${{ inputs.ref }}
+          export OUTPUT_DIR=${{ vars.OUTPUT_DIR }}/${{ steps.get_commit_info.outputs.repo_name }}/${{ inputs.branch }}
           mkdir -p ${OUTPUT_DIR}/csv
           export LIB_DIR=${{ vars.OUTPUT_DIR }}
           mkdir -p "${SRC_DIR}/build"        
