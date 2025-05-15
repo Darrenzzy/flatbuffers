@@ -20,7 +20,9 @@ jobs:
     steps:
       - name: Generate timestamp
         id: gen_time
-        run: echo "ts=$(date +'%Y%m%d_%H%M%S')" >> "$GITHUB_OUTPUT"
+        run: |
+          echo "ts=$(date +'%Y%m%d_%H%M%S')" >> "$GITHUB_OUTPUT"
+          echo "TIMESTAMP=$(date +%s)" >> $GITHUB_ENV
       - name: Set checkout branch
         id: set_branch
         run: echo "branch_name=master" >> "$GITHUB_OUTPUT"
@@ -68,6 +70,7 @@ jobs:
           BUILD_INFO_FILE="${OUTPUT_DIR}/csv/build_info.csv"
           {
             echo "key,value"
+            echo "build_id,${{ steps.get_commit_info.outputs.repo_name }}_${{ steps.set_branch.outputs.branch_name }}_${{ env.TIMESTAMP }}"
             echo "repo_name,${{ steps.get_commit_info.outputs.repo_name }}"
             echo "repo,${{ github.repository }}"
             echo "commit_msg,${{ steps.get_commit_info.outputs.message }}"
