@@ -77,7 +77,7 @@ jobs:
           
           {
             echo "key,value"
-            echo "build_id,${{ BUILD_ID }}${{ env.TIMESTAMP }}"
+            echo "build_id,$BUILD_ID${{ env.TIMESTAMP }}"
             echo "repo_name,${{ steps.get_commit_info.outputs.repo_name }}"
             echo "repo,${{ github.repository }}"
             echo "commit_msg,${{ steps.get_commit_info.outputs.message }}"
