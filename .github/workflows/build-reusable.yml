@@ -25,7 +25,7 @@ jobs:
     steps:
       - name: Notify Start
         run: |
-          curl -X POST $FEISHU_WEBHOOK -H "Content-Type: application/json" -d '{
+          curl -X POST ${{ secrets.FEISHU_WEBHOOK }} -H "Content-Type: application/json" -d '{
             "msg_type": "text",
             "content": { "text": "🚀 开始构建流程：${{ github.workflow }} by ${{ github.actor }}" }
           }'
@@ -51,7 +51,7 @@ jobs:
           echo "time=$(git -C build-${{ steps.gen_time.outputs.ts }} log -1 --pretty=format:'%cI')" >> $GITHUB_OUTPUT
       - name: Notify Docker build start
         run: |
-          curl -X POST $FEISHU_WEBHOOK -H "Content-Type: application/json" -d '{
+          curl -X POST ${{ secrets.FEISHU_WEBHOOK }} -H "Content-Type: application/json" -d '{
             "msg_type": "text",
             "content": { "text": "🔧 开始构建 Docker 镜像..." }
           }'
@@ -80,7 +80,7 @@ jobs:
               echo done"
       - name: Notify build completed
         run: |
-          curl -X POST $FEISHU_WEBHOOK -H "Content-Type: application/json" -d '{
+          curl -X POST ${{ secrets.FEISHU_WEBHOOK }} -H "Content-Type: application/json" -d '{
             "msg_type": "text",
             "content": { "text": "🎉 C++ 编译流程成功完成" }
           }'
@@ -149,7 +149,7 @@ jobs:
       - name: Notify All Done
         if: success()
         run: |
-          curl -X POST $FEISHU_WEBHOOK -H "Content-Type: application/json" -d '{
+          curl -X POST ${{ secrets.FEISHU_WEBHOOK }} -H "Content-Type: application/json" -d '{
             "msg_type": "text",
             "content": { "text": "📦 所有步骤完成，构建产物已上传。" }
           }'
@@ -158,7 +158,7 @@ jobs:
       - name: Notify failure
         if: failure()
         run: |
-          curl -X POST $FEISHU_WEBHOOK -H "Content-Type: application/json" -d '{
+          curl -X POST ${{ secrets.FEISHU_WEBHOOK }} -H "Content-Type: application/json" -d '{
             "msg_type": "text",
             "content": { "text": "❌ 构建失败，请查看日志。" }
           }'
