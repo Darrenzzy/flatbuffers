@@ -9,7 +9,6 @@ on:
     branches: [ master ]
   repository_dispatch:
     types: [ triggered-by-repo-a-update ]
-
 jobs:
   build-master:
     uses: ./.github/workflows/build-reusable.yml
@@ -18,4 +17,3 @@ jobs:
       ref: refs/heads/master
     secrets:
       REPO_B_DISPATCH_TOKEN: ${{ secrets.REPO_B_DISPATCH_TOKEN }}
-      FEISHU_WEBHOOK: ${{ secrets.FEISHU_WEBHOOK }}

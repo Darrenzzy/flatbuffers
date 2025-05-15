@@ -23,13 +23,7 @@ jobs:
     runs-on: self-hosted
     environment: dev
     steps:
-      - name: Notify Start
-        run: |
-          curl -X POST ${{ secrets.FEISHU_WEBHOOK }} -H "Content-Type: application/json" -d '{
-            "msg_type": "text",
-            "content": { "text": "🚀 开始构建流程：${{ github.workflow }} by ${{ github.actor }}" }
-          }'
-
+ 
       - name: Generate timestamp
         id: gen_time
         run: |
@@ -49,12 +43,7 @@ jobs:
           echo "message=$(git -C build-${{ steps.gen_time.outputs.ts }} log -1 --pretty=%B)" >> $GITHUB_OUTPUT
           echo "tag=$(git -C build-${{ steps.gen_time.outputs.ts }} describe --tags --abbrev=0 --exact-match 2>/dev/null || echo 'no-tag')" >> $GITHUB_OUTPUT
           echo "time=$(git -C build-${{ steps.gen_time.outputs.ts }} log -1 --pretty=format:'%cI')" >> $GITHUB_OUTPUT
-      - name: Notify Docker build start
-        run: |
-          curl -X POST ${{ secrets.FEISHU_WEBHOOK }} -H "Content-Type: application/json" -d '{
-            "msg_type": "text",
-            "content": { "text": "🔧 开始构建 Docker 镜像..." }
-          }'
+ 
       - name: Build inside Docker and output artifact
         run: |
           export SRC_DIR="${GITHUB_WORKSPACE}/build-${{ steps.gen_time.outputs.ts }}"
@@ -78,20 +67,17 @@ jobs:
               echo "cmake_version,$(cmake --version | head -n1 | awk '{print $3}')" >> /output/csv/system.csv &&
               echo "gcc_version,$(g++ -dumpfullversion)" >> /output/csv/system.csv &&
               echo done"
-      - name: Notify build completed
-        run: |
-          curl -X POST ${{ secrets.FEISHU_WEBHOOK }} -H "Content-Type: application/json" -d '{
-            "msg_type": "text",
-            "content": { "text": "🎉 C++ 编译流程成功完成" }
-          }'
+ 
       - name: Generate hash and build info CSV
         run: |
           export OUTPUT_DIR=${{ vars.OUTPUT_DIR }}/${{ steps.get_commit_info.outputs.repo_name }}/${{ inputs.branch }}
           HASH_FILE="${OUTPUT_DIR}/csv/hashes.csv"          
+          BUILD_ID=$(echo -n "${{ steps.get_commit_info.outputs.repo_name }}_${{ inputs.branch }}" | cksum | awk '{print $1}')
           BUILD_INFO_FILE="${OUTPUT_DIR}/csv/build_info.csv"
+          
           {
             echo "key,value"
-            echo "build_id,${{ steps.get_commit_info.outputs.repo_name }}_${{ inputs.branch }}_${{ env.TIMESTAMP }}"
+            echo "build_id,${{ BUILD_ID }}${{ env.TIMESTAMP }}"
             echo "repo_name,${{ steps.get_commit_info.outputs.repo_name }}"
             echo "repo,${{ github.repository }}"
             echo "commit_msg,${{ steps.get_commit_info.outputs.message }}"
@@ -145,20 +131,4 @@ jobs:
           export SRC_DIR="${GITHUB_WORKSPACE}/build-${{ steps.gen_time.outputs.ts }}"
           echo "${SRC_DIR}/build"  # 清理工作目录
           # rm -rf ${SRC_DIR}/build/*  # 清理工作目录
-# 🔚 通知构建结束（成功）
-      - name: Notify All Done
-        if: success()
-        run: |
-          curl -X POST ${{ secrets.FEISHU_WEBHOOK }} -H "Content-Type: application/json" -d '{
-            "msg_type": "text",
-            "content": { "text": "📦 所有步骤完成，构建产物已生成。" }
-          }'
-
-      # ❌ 如果失败则发送飞书通知
-      - name: Notify failure
-        if: failure()
-        run: |
-          curl -X POST ${{ secrets.FEISHU_WEBHOOK }} -H "Content-Type: application/json" -d '{
-            "msg_type": "text",
-            "content": { "text": "❌ 构建失败，请查看日志。" }
-          }'
+ 
