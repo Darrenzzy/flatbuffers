@@ -26,7 +26,8 @@ jobs:
         id: gen_time
         run: |
           echo "ts=$(date +'%Y%m%d_%H%M%S')" >> "$GITHUB_OUTPUT"
-          echo "TIMESTAMP=$(date +%s)" >> $GITHUB_ENV
+          echo "build_time=$(date +'%F %T')" >> "$GITHUB_OUTPUT"
+          echo "TIMESTAMP=$(date +'%Y%m%d_%H%M%S')" >> $GITHUB_ENV
       - name: Checkout repository to dynamic path
         uses: actions/checkout@v4
         with:
@@ -75,6 +76,7 @@ jobs:
           {
             echo "key,value"
             echo "build_id,${{ env.TIMESTAMP }}${BUILD_ID}"
+            echo "build_time,${{ steps.gen_time.outputs.build_time }}"
             echo "repo_name,${{ steps.get_commit_info.outputs.repo_name }}"
             echo "repo,${{ github.repository }}"
             echo "commit_msg,${{ steps.get_commit_info.outputs.message }}"
