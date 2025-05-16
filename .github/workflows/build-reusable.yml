@@ -71,11 +71,12 @@ jobs:
           export OUTPUT_DIR=${{ vars.OUTPUT_DIR }}/${{ steps.get_commit_info.outputs.repo_name }}/${{ inputs.branch }}
           HASH_FILE="${OUTPUT_DIR}/csv/hashes.csv"          
           BUILD_ID=$(echo -n "${{ steps.get_commit_info.outputs.repo_name }}_${{ inputs.branch }}" | cksum | awk '{print $1}')
+          echo "$BUILD_ID"
           BUILD_INFO_FILE="${OUTPUT_DIR}/csv/build_info.csv"
           
           {
             echo "key,value"
-            echo "build_id,$BUILD_ID${{ env.TIMESTAMP }}"
+            echo "build_id,${BUILD_ID}${{ env.TIMESTAMP }}"
             echo "repo_name,${{ steps.get_commit_info.outputs.repo_name }}"
             echo "repo,${{ github.repository }}"
             echo "commit_msg,${{ steps.get_commit_info.outputs.message }}"
