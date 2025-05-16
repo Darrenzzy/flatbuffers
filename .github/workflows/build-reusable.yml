@@ -27,7 +27,8 @@ jobs:
         run: |
           echo "ts=$(date +'%Y%m%d_%H%M%S')" >> "$GITHUB_OUTPUT"
           echo "build_time=$(date +'%F %T')" >> "$GITHUB_OUTPUT"
-          echo "TIMESTAMP=$(date +'%Y%m%d_%H%M%S')" >> $GITHUB_ENV
+          echo "TIMESTAMP=$(date +%s)" >> $GITHUB_ENV
+          
       - name: Checkout repository to dynamic path
         uses: actions/checkout@v4
         with:
