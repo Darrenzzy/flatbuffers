@@ -48,8 +48,8 @@ jobs:
         run: |
           export SRC_DIR="${GITHUB_WORKSPACE}/build-${{ steps.gen_time.outputs.ts }}"
           export OUTPUT_DIR=${{ vars.OUTPUT_DIR }}/${{ steps.get_commit_info.outputs.repo_name }}/${{ inputs.branch }}
+          export LIB_DIR="${OUTPUT_DIR}/${CLIENT_REPO_NAME:-flatbuffers}/${CLIENT_REF:-master}/"
           mkdir -p ${OUTPUT_DIR}/csv
-          export LIB_DIR=${{ vars.OUTPUT_DIR }}
           mkdir -p "${SRC_DIR}/build"        
           docker run --rm \
             -v "${SRC_DIR}:/workspace" \
@@ -58,7 +58,7 @@ jobs:
             -w	/workspace \
             --entrypoint bash davidwu-base-gcc:1.0  -c "
               cd build &&
-              cmake -DCMAKE_CXX_FLAGS="-I/custom_lib" -DCMAKE_INSTALL_PREFIX=/output .. &&
+              cmake -DARROW_FLATBUFFERS=ON -DFLATBUFFERS_HOME=/output -DCMAKE_CXX_FLAGS="-I/custom_lib" -DCMAKE_INSTALL_PREFIX=/output .. &&
               cmake --build . -- -j50 &&
               cmake --install . &&
               chmod -R 777 /output/* &&
